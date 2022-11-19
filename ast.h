@@ -27,7 +27,7 @@ typedef struct AST_STRUCT {
     } Type;
 } AST_Node;
 
-void InvalidSyntax(char syn, int _terminate);
+void InvalidSyntax(char syn, int _ret);
 
 AST_Node *InitializeASTNode(char *value, int type);
 AST_Node *ASTGetNextNode(Lexer_T *lexer);
