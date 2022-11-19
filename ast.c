@@ -4,11 +4,11 @@
 #include <stdio.h>
 #include <ctype.h>
 
-void InvalidSyntax(char syn, int _terminate)
+void InvalidSyntax(char syn, int _ret)
 {
     printf("Critical error: ['%c'] -> undefined syntax.\n", syn);
 
-    exit(1);
+    exit(_ret);
 }
 
 AST_Node *InitializeASTNode(char *value, int type)
