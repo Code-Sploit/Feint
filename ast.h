@@ -5,10 +5,13 @@
 
 typedef struct AST_STRUCT {
     char *value;
+    char *_dest;
+    char *_arg;
 
     enum {
         TOKEN_ID,
         TOKEN_VAL,
+        TOKEN_DIGIT,
         TOKEN_EXCL,
         TOKEN_AT,
         TOKEN_HASHTAG,
@@ -23,7 +26,9 @@ typedef struct AST_STRUCT {
         TOKEN_RPAREN,
         TOKEN_PLUS,
         TOKEN_MINUS,
+        TOKEN_IS,
         TOKEN_SEMICOLON,
+        TOKEN_BFUNC,
         TOKEN_EOF
     } Type;
 } AST_Node;
@@ -31,4 +36,5 @@ typedef struct AST_STRUCT {
 void InvalidSyntax(char syn, int _ret);
 
 AST_Node *InitializeASTNode(char *value, int type);
+AST_Node *InitializeASTFunc(char *_src, char *_dest, char *_arg, int type);
 AST_Node *ASTGetNextNode(Lexer_T *lexer);

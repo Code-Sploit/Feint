@@ -1,5 +1,7 @@
 construct int main {
-    print("Hello World!");
+    io->print("Hello World!\n");
+    io->print("Hello, This is feint compiler!\n");
+    io-print("test");
 
     return 0;
 }
