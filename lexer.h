@@ -9,6 +9,8 @@ Lexer_T *InitializeLexer(char *src);
 
 char LexerPeekOffset(Lexer_T *lexer, int _offset);
 
+char *LexerGetVal(Lexer_T *lexer, char *_delim);
+
 void LexerAdvanceWithId(Lexer_T *lexer);
 void LexerAdvanceWithDigit(Lexer_T *lexer);
 

@@ -45,20 +45,23 @@ AST_Node *ASTGetNextNode(Lexer_T *lexer)
         {
             switch (lexer->c)
             {
-                case '!': {Nodes[NewIndex(Nodes)] = InitializeASTNode("!", TOKEN_EXCL);}
-                case '@': {Nodes[NewIndex(Nodes)] = InitializeASTNode("@", TOKEN_AT);}
-                case '#': {Nodes[NewIndex(Nodes)] = InitializeASTNode("#", TOKEN_HASHTAG);}
-                case '$': {Nodes[NewIndex(Nodes)] = InitializeASTNode("$", TOKEN_DOLLAR);}
-                case '%': {Nodes[NewIndex(Nodes)] = InitializeASTNode("%", TOKEN_PERCENT);}
-                case '^': {Nodes[NewIndex(Nodes)] = InitializeASTNode("^", TOKEN_UP);}
-                case '&': {Nodes[NewIndex(Nodes)] = InitializeASTNode("&", TOKEN_ZS);}
-                case '*': {Nodes[NewIndex(Nodes)] = InitializeASTNode("*", TOKEN_STAR);}
-                case '(': {Nodes[NewIndex(Nodes)] = InitializeASTNode("(", TOKEN_LPAREN);}
-                case ')': {Nodes[NewIndex(Nodes)] = InitializeASTNode(")", TOKEN_RPAREN);}
-                case '-': {Nodes[NewIndex(Nodes)] = InitializeASTNode("-", TOKEN_MINUS);}
-                case '+': {Nodes[NewIndex(Nodes)] = InitializeASTNode("+", TOKEN_PLUS);}
-                case '{': {Nodes[NewIndex(Nodes)] = InitializeASTNode("{", TOKEN_LBRACE);}
-                case '}': {Nodes[NewIndex(Nodes)] = InitializeASTNode("}", TOKEN_RBRACE);}
+                case '!': {Nodes[NewIndex(Nodes)] = InitializeASTNode("!", TOKEN_EXCL); LexerAdvanceCharacter(lexer); continue;}
+                case '@': {Nodes[NewIndex(Nodes)] = InitializeASTNode("@", TOKEN_AT); LexerAdvanceCharacter(lexer); continue;}
+                case '#': {Nodes[NewIndex(Nodes)] = InitializeASTNode("#", TOKEN_HASHTAG); LexerAdvanceCharacter(lexer); continue;}
+                case '$': {Nodes[NewIndex(Nodes)] = InitializeASTNode("$", TOKEN_DOLLAR); LexerAdvanceCharacter(lexer); continue;}
+                case '%': {Nodes[NewIndex(Nodes)] = InitializeASTNode("%", TOKEN_PERCENT); LexerAdvanceCharacter(lexer); continue;}
+                case '^': {Nodes[NewIndex(Nodes)] = InitializeASTNode("^", TOKEN_UP); LexerAdvanceCharacter(lexer); continue;}
+                case '&': {Nodes[NewIndex(Nodes)] = InitializeASTNode("&", TOKEN_ZS); LexerAdvanceCharacter(lexer); continue;}
+                case '*': {Nodes[NewIndex(Nodes)] = InitializeASTNode("*", TOKEN_STAR); LexerAdvanceCharacter(lexer); continue;}
+                case '(': {Nodes[NewIndex(Nodes)] = InitializeASTNode("(", TOKEN_LPAREN); LexerAdvanceCharacter(lexer); continue;}
+                case ')': {Nodes[NewIndex(Nodes)] = InitializeASTNode(")", TOKEN_RPAREN); LexerAdvanceCharacter(lexer); continue;}
+                case '-': {Nodes[NewIndex(Nodes)] = InitializeASTNode("-", TOKEN_MINUS); LexerAdvanceCharacter(lexer); continue;}
+                case '+': {Nodes[NewIndex(Nodes)] = InitializeASTNode("+", TOKEN_PLUS); LexerAdvanceCharacter(lexer); continue;}
+                case '{': {Nodes[NewIndex(Nodes)] = InitializeASTNode("{", TOKEN_LBRACE); LexerAdvanceCharacter(lexer); continue;}
+                case '}': {Nodes[NewIndex(Nodes)] = InitializeASTNode("}", TOKEN_RBRACE); LexerAdvanceCharacter(lexer); continue;}
+                case ';': {Nodes[NewIndex(Nodes)] = InitializeASTNode(";", TOKEN_SEMICOLON); LexerAdvanceCharacter(lexer); continue;}
+
+                case '"': {Nodes[NewIndex(Nodes)] = InitializeASTNode(LexerGetVal(lexer, "\""), TOKEN_VAL); LexerAdvanceCharacter(lexer); continue;}
 
                 default: InvalidSyntax(lexer->c, 1);
             }

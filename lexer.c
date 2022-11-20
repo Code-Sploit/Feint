@@ -21,6 +21,22 @@ char LexerPeekOffset(Lexer_T *lexer, int _offset)
     return lexer->src[lexer->i + _offset];
 }
 
+char *LexerGetVal(Lexer_T *lexer, char *_delim)
+{
+    char *value = calloc(1, sizeof(char));
+
+    while (isspace(LexerPeekOffset(lexer, 1)) == 0 && LexerPeekOffset(lexer, 1) != '"')
+    {
+        value = realloc(value, (strlen(value) + 2));
+
+        strcat(value, (char[]) {LexerPeekOffset(lexer, 1), 0});
+
+        LexerAdvanceCharacter(lexer);
+    }
+
+    return value;
+}
+
 void LexerAdvanceCharacter(Lexer_T *lexer)
 {
     lexer->i++;
@@ -73,6 +89,8 @@ void LexerGenerateAST(Lexer_T *lexer)
     while ((Node = ASTGetNextNode(lexer)))
     {
         Nodes[(sizeof(Nodes) / sizeof(Nodes[0])) + 1] = Node;
+
+        if (Node->Type == TOKEN_VAL) {printf("%s\n", Node->value);}
 
         if (Node->Type == TOKEN_EOF) {break;}
     }

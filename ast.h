@@ -8,6 +8,7 @@ typedef struct AST_STRUCT {
 
     enum {
         TOKEN_ID,
+        TOKEN_VAL,
         TOKEN_EXCL,
         TOKEN_AT,
         TOKEN_HASHTAG,
