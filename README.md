@@ -1,5 +1,5 @@
 # Feint
-A compiler for x86 (amd64) operating systems written in C and Assembly x86
+A compiler for x86 (amd64) operating systems written in C and Assembly x86. Written for: FeintLanguage
 
 # Syntax
 ./feintc [input file] [debug: 0, 1]
