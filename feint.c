@@ -31,11 +31,11 @@ int FeintCompile(char *InFile, char *CompilerArguments, int _Bytes)
         strcat(FileContents, TempStorage);
     }
 
-    Lexer_T *lexer = InitializeLexer(FileContents);
+    Lexer_T *lexer   = InitializeLexer(FileContents);
 
-    /* Get an AST tree of the file contents */
+    Scope_T *_MainScope = ParserCompile(lexer, atoi(CompilerArguments));
 
-    LexerGenerateAST(lexer);
+    ASTGenerateMachineCode(_MainScope, atoi(CompilerArguments));
 
     return 0;
 }
