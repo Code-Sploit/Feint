@@ -167,7 +167,7 @@ Scope_T *ParserCompile(Lexer_T *lexer, int _debug)
 
                         _TokensAdded++;
 
-                        if (_debug) {printf("Found printvar() function call: Accessed variable: '%s'\n", _NAME);}
+                        if (_debug) {printf("\nFound printvar() function call: Accessed variable: '%s'\n", _NAME->_value);}
 
                         CurToken = LexerGetNextToken(lexer);
 
@@ -184,7 +184,7 @@ Scope_T *ParserCompile(Lexer_T *lexer, int _debug)
 
                         _TokensAdded++;
 
-                        if (_debug) {printf("Found return statement: Returns: '%s'\n", _ret);}
+                        if (_debug) {printf("\nFound return statement: Returns: '%s'\n\n", _ret);}
 
                         CurToken = LexerGetNextToken(lexer);
 
