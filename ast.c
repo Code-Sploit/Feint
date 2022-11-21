@@ -24,6 +24,19 @@ char *LenExt(char *_e)
     return ret;
 }
 
+char *ScopeExt(char *_e, char *_scope)
+{
+    char *ret = calloc(1, sizeof(char));
+
+    ret = realloc(ret, (strlen(_e) + strlen(_scope) + strlen("_") + 1));
+
+    strcat(ret, _scope);
+    strcat(ret, "_");
+    strcat(ret, _e);
+
+    return ret;
+}
+
 void WriteASMTo(char *_out, char *_start_function_data, char *_declarations)
 {
     FILE *fp = fopen(_out, "w+");
@@ -77,9 +90,10 @@ void ASTGenerateMachineCode(Scope_T *_Scope, int _debug)
         char *oper  = _Scope->Tokens[i]->_oper;
         char *name  = _Scope->Tokens[i]->_name;
         char *type  = _Scope->Tokens[i]->_type;
+        char *scope = _Scope->Tokens[i]->_scope;
         char *otype = _Scope->Tokens[i]->_otype;
 
-        if (_debug) {printf("V: '%s' O: '%s' N: '%s' T: '%s' O: '%s'\n", val, oper, name, type, otype);}
+        if (_debug) {printf("V: '%s' O: '%s' N: '%s' T: '%s' S: '%s' O: '%s'\n", val, oper, name, type, scope, otype);}
 
         if (Compare(otype, "STATEMENT"))
         {
@@ -101,20 +115,21 @@ void ASTGenerateMachineCode(Scope_T *_Scope, int _debug)
             if (Compare(type, "int"))
             {
                 /* Integer definition */
-                _asm_rodata = realloc(_asm_rodata, (strlen(_asm_rodata) + strlen(name) + strlen(": db \"") + strlen(val) + strlen("\", ENDL") + 1));
+                _asm_rodata = realloc(_asm_rodata, (strlen(_asm_rodata) + strlen(name) + strlen(": db \"") + strlen(ScopeExt(val, scope)) + strlen("\", ENDL") + 1));
 
-                strcat(_asm_rodata, name);
+                strcat(_asm_rodata, ScopeExt(name, scope));
                 strcat(_asm_rodata, ": db \"");
                 strcat(_asm_rodata, val);
                 strcat(_asm_rodata, "\", ENDL");
                 strcat(_asm_rodata, "\n");
 
-                _asm_rodata = realloc(_asm_rodata, (strlen(_asm_rodata) + strlen(LenExt(name)) + strlen(": equ $ - ") + strlen(name) + strlen("\n") + 1));
+                _asm_rodata = realloc(_asm_rodata, (strlen(_asm_rodata) + strlen(LenExt(name)) + strlen(": equ $ - ") + strlen(ScopeExt(name, scope)) + strlen("\n") + 1));
 
                 strcat(_asm_rodata, LenExt(name));
                 strcat(_asm_rodata, ": equ $ - ");
-                strcat(_asm_rodata, name);
+                strcat(_asm_rodata, ScopeExt(name, scope));
                 strcat(_asm_rodata, "\n");
+
 
                 if (_debug) {printf("%s\n", _asm_rodata);}
             }
@@ -122,20 +137,22 @@ void ASTGenerateMachineCode(Scope_T *_Scope, int _debug)
             if (Compare(type, "str"))
             {
                 /* String definition */
-                _asm_rodata = realloc(_asm_rodata, (strlen(_asm_rodata) + strlen(name) + strlen(": db \"") + strlen(val) + strlen("\", ENDL") + 1));
+                _asm_rodata = realloc(_asm_rodata, (strlen(_asm_rodata) + strlen(name) + strlen(": db \"") + strlen(ScopeExt(val, scope)) + strlen("\", ENDL") + 1));
 
-                strcat(_asm_rodata, name);
+                strcat(_asm_rodata, ScopeExt(name, scope));
                 strcat(_asm_rodata, ": db \"");
                 strcat(_asm_rodata, val);
                 strcat(_asm_rodata, "\", ENDL");
                 strcat(_asm_rodata, "\n");
 
-                _asm_rodata = realloc(_asm_rodata, (strlen(_asm_rodata) + strlen(LenExt(name)) + strlen(": equ $ - ") + strlen(name) + strlen("\n") + 1));
+                _asm_rodata = realloc(_asm_rodata, (strlen(_asm_rodata) + strlen(LenExt(name)) + strlen(": equ $ - ") + strlen(ScopeExt(name, scope)) + strlen("\n") + 1));
 
                 strcat(_asm_rodata, LenExt(name));
                 strcat(_asm_rodata, ": equ $ - ");
-                strcat(_asm_rodata, name);
+                strcat(_asm_rodata, ScopeExt(name, scope));
                 strcat(_asm_rodata, "\n");
+
+                if (_debug) {printf("%s\n", _asm_rodata);}
             }
 
             if (Compare(name, "printvar"))
@@ -143,7 +160,7 @@ void ASTGenerateMachineCode(Scope_T *_Scope, int _debug)
                 _asm_start_f = realloc(_asm_start_f, (strlen(_asm_start_f) + strlen("mov rax, 1\nmov rdi, 1\nmov rsi, ") + strlen(val) + strlen("\nmov rdx, ") + strlen(LenExt(val)) + strlen("\nsyscall\n")) + 1);
 
                 strcat(_asm_start_f, "mov rax, 1\nmov rdi, 1\nmov rsi, ");
-                strcat(_asm_start_f, val);
+                strcat(_asm_start_f, ScopeExt(val, scope));
                 strcat(_asm_start_f, "\nmov rdx, ");
                 strcat(_asm_start_f, LenExt(val));
                 strcat(_asm_start_f, "\nsyscall\n");
