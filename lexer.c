@@ -156,7 +156,7 @@ char *LexerAdvanceWithId(Lexer_T *lexer)
 {
     char *id = calloc(1, sizeof(id));
 
-    while (isalpha(LexerPeekOffset(lexer, 0)) != 0)
+    while (isalpha(LexerPeekOffset(lexer, 0)) != 0 || LexerPeekOffset(lexer, 0) == '_')
     {
         id = realloc(id, (strlen(id) + 2));
 
@@ -198,7 +198,6 @@ Token_Node *LexerGetNextToken(Lexer_T *lexer)
 
     while (LexerPeekOffset(lexer, 1) != '\0')
     {
-        //printf("S: %d A: %d D: %d\n", isspace(lexer->c), isalpha(lexer->c), isdigit(lexer->c));
 
         if (lexer->c == 13 || lexer->c == 10 || lexer->c == ' ' || lexer->c == '\t') {LexerAdvanceCharacter(lexer); continue;}
 
