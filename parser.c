@@ -40,7 +40,7 @@ Scope_T *InitializeScope(char *_name, Scope_Node *_Tokens[256])
     return NewScope;
 }
 
-Scope_Node *InitializeScopeNode(char *_type, char *_name, char *_oper, char *_value, char *_otype)
+Scope_Node *InitializeScopeNode(char *_type, char *_name, char *_oper, char *_value, char *_scope, char *_otype)
 {
     Scope_Node *NewNode = calloc(1, sizeof(Scope_Node));
 
@@ -48,6 +48,7 @@ Scope_Node *InitializeScopeNode(char *_type, char *_name, char *_oper, char *_va
     NewNode->_name  = _name;
     NewNode->_oper  = _oper;
     NewNode->_value = _value;
+    NewNode->_scope = _scope;
     NewNode->_otype = _otype;
 
     return NewNode;
@@ -77,6 +78,8 @@ Scope_T *ParserCompile(Lexer_T *lexer, int _debug)
 {
     Scope_Node *_MainTokens[256];
     Token_Node *CurToken = LexerGetNextToken(lexer);
+
+    char *_CurrentScope;
 
     int _TokensAdded = 0;
 
@@ -109,6 +112,8 @@ Scope_T *ParserCompile(Lexer_T *lexer, int _debug)
 
                 CurToken = LexerGetNextToken(lexer);
 
+                _CurrentScope = _fname->_value;
+
                 while (!MatchExpr(CurToken->_value, "}"))
                 {
                     if (MatchExpr(CurToken->_value, "int"))
@@ -120,7 +125,7 @@ Scope_T *ParserCompile(Lexer_T *lexer, int _debug)
                         Token_Node *_oper  = LexerGetNextToken(lexer);
                         Token_Node *_value = LexerGetNextToken(lexer);
 
-                        Scope_Node *_Node = InitializeScopeNode(_type->_value, _name->_value, _oper->_value, _value->_value, "EXPR");
+                        Scope_Node *_Node = InitializeScopeNode(_type->_value, _name->_value, _oper->_value, _value->_value, _CurrentScope, "EXPR");
 
                         _MainTokens[_TokensAdded] = _Node;
 
@@ -142,7 +147,7 @@ Scope_T *ParserCompile(Lexer_T *lexer, int _debug)
                         Token_Node *_oper  = LexerGetNextToken(lexer);
                         Token_Node *_value = LexerGetNextToken(lexer);
 
-                        Scope_Node *_Node = InitializeScopeNode(_type->_value, _name->_value, _oper->_value, _value->_value, "EXPR");
+                        Scope_Node *_Node = InitializeScopeNode(_type->_value, _name->_value, _oper->_value, _value->_value, _CurrentScope, "EXPR");
 
                         _MainTokens[_TokensAdded] = _Node;
 
@@ -161,7 +166,7 @@ Scope_T *ParserCompile(Lexer_T *lexer, int _debug)
                         Token_Node *_NAME    = LexerGetNextToken(lexer);
                         Token_Node *_R_PAREN = LexerGetNextToken(lexer);
 
-                        Scope_Node *_Node = InitializeScopeNode(" ", "printvar", " ", _NAME->_value, "EXPR");
+                        Scope_Node *_Node = InitializeScopeNode(" ", "printvar", " ", _NAME->_value, _CurrentScope, "EXPR");
 
                         _MainTokens[_TokensAdded] = _Node;
 
@@ -178,7 +183,7 @@ Scope_T *ParserCompile(Lexer_T *lexer, int _debug)
                     {
                         char *_ret = LexerGetNextToken(lexer)->_value;
 
-                        Scope_Node *_Node = InitializeScopeNode("void", "return", " ", _ret, "STATEMENT");
+                        Scope_Node *_Node = InitializeScopeNode("void", "return", " ", _ret, _CurrentScope, "STATEMENT");
 
                         _MainTokens[_TokensAdded] = _Node;
 
