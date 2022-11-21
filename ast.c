@@ -12,7 +12,19 @@ int Compare(char *_e1, char *_e2)
     return 0;
 }
 
-void WriteASMTo(char *_out, char *_data)
+char *LenExt(char *_e)
+{
+    char *ret = calloc(1, sizeof(char));
+
+    ret = realloc(ret, (strlen(_e) + strlen("len\n") + 1));
+
+    strcat(ret, _e);
+    strcat(ret, "len");
+
+    return ret;
+}
+
+void WriteASMTo(char *_out, char *_start_function_data, char *_declarations)
 {
     FILE *fp = fopen(_out, "w+");
 
@@ -23,7 +35,13 @@ void WriteASMTo(char *_out, char *_data)
         exit(1);
     }
 
-    fputs(_data, fp);
+    char *_StandardDeclarations = "%define ENDL 0x0D, 0x0A\n";
+
+    fputs(_StandardDeclarations, fp);
+
+    fputs(_start_function_data, fp);
+    fputs(_declarations, fp);
+
     fclose(fp);
 
     char *_nasm_cmd = calloc(1, sizeof(char));
@@ -44,15 +62,14 @@ void WriteASMTo(char *_out, char *_data)
 
 void ASTGenerateMachineCode(Scope_T *_Scope, int _debug)
 {
-    printf("\n\n");
+    char *_asm_rodata   = calloc(1, sizeof(char));
+    char *_asm_start_f  = calloc(1, sizeof(char));
 
-    char *template = calloc(1, sizeof(char));
+    _asm_start_f = realloc(_asm_start_f, (strlen(_asm_start_f) + strlen("global _start\n\nsection .text\n\n_start:\n") + 1));
+    _asm_rodata = realloc(_asm_rodata, (strlen(_asm_rodata) + strlen("\nsection .rodata\n") + 1));
 
-    template = realloc(template, (strlen(template) + strlen("global _start\n\nsection .text\n\n_start:\nmov rax, 60\nmov rdi, 0\nsyscall") + 1));
-
-    strcat(template, "global _start\n\nsection .text\n\n_start:\nmov rax, 60\nmov rdi, 0\nsyscall");
-
-    int _LastToken = 0;
+    strcat(_asm_start_f, "global _start\n\nsection .text\n\n_start:\n");
+    strcat(_asm_rodata, "\nsection .rodata\n");
 
     for (int i = 0; i < _Scope->_T_count; i++)
     {
@@ -66,51 +83,72 @@ void ASTGenerateMachineCode(Scope_T *_Scope, int _debug)
 
         if (Compare(otype, "STATEMENT"))
         {
-            _LastToken = 0;
-
             if (Compare(name, "return"))
             {
                 /* Return statement */
+                _asm_start_f = realloc(_asm_start_f, (strlen(_asm_start_f) + (strlen("mov rax, 60\nmov rdi, 0\nsyscall\n") + 1)));
+
+                strcat(_asm_start_f, "mov rax, 60\nmov rdi, 0\nsyscall\n");
+
+                if (_debug) {printf("%s\n", _asm_start_f);}
+
+                if (Compare(name, "main")) {break;}
             }
         }
 
         if (Compare(otype, "EXPR"))
         {
-            if (_LastToken != 1)
-            {
-                template = realloc(template, strlen(template) + strlen("\nsection .rodata\n") + 1);
-
-                strcat(template, "\nsection .rodata\n");
-            }
-
-            _LastToken = 1;
-
             if (Compare(type, "int"))
             {
                 /* Integer definition */
-                template = realloc(template, (strlen(template) + strlen(name) + strlen(": db \"") + strlen(val) + strlen("\"") + 1));
+                _asm_rodata = realloc(_asm_rodata, (strlen(_asm_rodata) + strlen(name) + strlen(": db \"") + strlen(val) + strlen("\", ENDL") + 1));
 
-                strcat(template, name);
-                strcat(template, ": db \"");
-                strcat(template, val);
-                strcat(template, "\"");
-                strcat(template, "\n");
+                strcat(_asm_rodata, name);
+                strcat(_asm_rodata, ": db \"");
+                strcat(_asm_rodata, val);
+                strcat(_asm_rodata, "\", ENDL");
+                strcat(_asm_rodata, "\n");
 
-                if (_debug) {printf("%s\n", template);}
+                _asm_rodata = realloc(_asm_rodata, (strlen(_asm_rodata) + strlen(LenExt(name)) + strlen(": equ $ - ") + strlen(name) + strlen("\n") + 1));
+
+                strcat(_asm_rodata, LenExt(name));
+                strcat(_asm_rodata, ": equ $ - ");
+                strcat(_asm_rodata, name);
+                strcat(_asm_rodata, "\n");
+
+                if (_debug) {printf("%s\n", _asm_rodata);}
             }
 
             if (Compare(type, "str"))
             {
                 /* String definition */
-                template = realloc(template, (strlen(template) + strlen(name) + strlen(": db \"") + strlen(val) + strlen("\"") + 1));
+                _asm_rodata = realloc(_asm_rodata, (strlen(_asm_rodata) + strlen(name) + strlen(": db \"") + strlen(val) + strlen("\", ENDL") + 1));
 
-                strcat(template, name);
-                strcat(template, ": db \"");
-                strcat(template, val);
-                strcat(template, "\"");
-                strcat(template, "\n");
+                strcat(_asm_rodata, name);
+                strcat(_asm_rodata, ": db \"");
+                strcat(_asm_rodata, val);
+                strcat(_asm_rodata, "\", ENDL");
+                strcat(_asm_rodata, "\n");
 
-                if (_debug) {printf("%s\n", template);}
+                _asm_rodata = realloc(_asm_rodata, (strlen(_asm_rodata) + strlen(LenExt(name)) + strlen(": equ $ - ") + strlen(name) + strlen("\n") + 1));
+
+                strcat(_asm_rodata, LenExt(name));
+                strcat(_asm_rodata, ": equ $ - ");
+                strcat(_asm_rodata, name);
+                strcat(_asm_rodata, "\n");
+            }
+
+            if (Compare(name, "printvar"))
+            {
+                _asm_start_f = realloc(_asm_start_f, (strlen(_asm_start_f) + strlen("mov rax, 1\nmov rdi, 1\nmov rsi, ") + strlen(val) + strlen("\nmov rdx, ") + strlen(LenExt(val)) + strlen("\nsyscall\n")) + 1);
+
+                strcat(_asm_start_f, "mov rax, 1\nmov rdi, 1\nmov rsi, ");
+                strcat(_asm_start_f, val);
+                strcat(_asm_start_f, "\nmov rdx, ");
+                strcat(_asm_start_f, LenExt(val));
+                strcat(_asm_start_f, "\nsyscall\n");
+
+                if (_debug) {printf("%s\n", _asm_start_f);}
             }
         }
 
@@ -122,5 +160,5 @@ void ASTGenerateMachineCode(Scope_T *_Scope, int _debug)
         }
     }
 
-    WriteASMTo("output.s", template);
+    WriteASMTo("output.s", _asm_start_f, _asm_rodata);
 }
