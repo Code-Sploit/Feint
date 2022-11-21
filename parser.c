@@ -155,6 +155,25 @@ Scope_T *ParserCompile(Lexer_T *lexer, int _debug)
                         continue;
                     }
 
+                    if (MatchExpr(CurToken->_value, "printvar"))
+                    {
+                        Token_Node *_L_PAREN = LexerGetNextToken(lexer);
+                        Token_Node *_NAME    = LexerGetNextToken(lexer);
+                        Token_Node *_R_PAREN = LexerGetNextToken(lexer);
+
+                        Scope_Node *_Node = InitializeScopeNode(" ", "printvar", " ", _NAME->_value, "EXPR");
+
+                        _MainTokens[_TokensAdded] = _Node;
+
+                        _TokensAdded++;
+
+                        if (_debug) {printf("Found printvar() function call: Accessed variable: '%s'\n", _NAME);}
+
+                        CurToken = LexerGetNextToken(lexer);
+
+                        continue;
+                    }
+
                     if (MatchExpr(CurToken->_value, "return"))
                     {
                         char *_ret = LexerGetNextToken(lexer)->_value;
