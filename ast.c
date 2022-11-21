@@ -100,9 +100,11 @@ void ASTGenerateMachineCode(Scope_T *_Scope, int _debug)
             if (Compare(name, "return"))
             {
                 /* Return statement */
-                _asm_start_f = realloc(_asm_start_f, (strlen(_asm_start_f) + (strlen("mov rax, 60\nmov rdi, 0\nsyscall\n") + 1)));
+                _asm_start_f = realloc(_asm_start_f, (strlen(_asm_start_f) + (strlen("mov rax, 60\nmov rdi,") + strlen(val) + strlen("\nsyscall\n") + 1)));
 
-                strcat(_asm_start_f, "mov rax, 60\nmov rdi, 0\nsyscall\n");
+                strcat(_asm_start_f, "mov rax, 60\nmov rdi, ");
+		strcat(_asm_start_f, val);
+		strcat(_asm_start_f, "\nsyscall\n");
 
                 if (_debug) {printf("%s\n", _asm_start_f);}
 
