@@ -1,0 +1,11 @@
+construct foo {
+    str b_a = "Hello";
+}
+
+construct main {
+    str t_a = "Hello, World!";
+
+    printvar(t_a);
+
+    return 0;
+}
