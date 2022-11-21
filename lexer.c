@@ -1,9 +1,16 @@
-#include "ast.h"
+#include "lexer.h"
 
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
+
+void InvalidSyntax(char syn, int _ret)
+{
+    printf("Critical error: ['%c'] -> undefined syntax.\n", syn);
+
+    exit(_ret);
+}
 
 Lexer_T *InitializeLexer(char *src)
 {
@@ -159,10 +166,37 @@ void LexerSkipUntil(Lexer_T *lexer, char ch)
 
 char *LexerGetFunctionArg(Lexer_T *lexer)
 {
+    char *val = calloc(1, sizeof(char));
+
     /* Skip alpha until over LPAREN */
     LexerSkipUntil(lexer, '(');
 
-    char *val = LexerGetVal(lexer, '"');
+    LexerAdvanceCharacter(lexer);
+
+    if (LexerPeekOffset(lexer, 0) == '"')
+    {
+        /* String argument */
+
+        val = LexerGetVal(lexer, '"');
+    }
+    else if (isalpha(LexerPeekOffset(lexer, 0)) != 0)
+    {
+        /* Variable argument */
+
+    }
+    else
+    {
+        /* Int argument */
+
+        while (isdigit(LexerPeekOffset(lexer, 0) != 0))
+        {
+            val = realloc(val, (strlen(val) + 2));
+
+            strcat(val, (char[]) {LexerPeekOffset(lexer, 0), 0});
+
+            LexerAdvanceCharacter(lexer);
+        }
+    }
 
     return val;
 }
@@ -191,7 +225,7 @@ char *LexerAdvanceWithDigit(Lexer_T *lexer)
     {
         digit = realloc(digit, (strlen(digit) + 2));
 
-        strcat(digit, (char[]) {LexerPeekOffset(lexer, 0)});
+        strcat(digit, (char[]) {lexer->c, 0});
 
         LexerAdvanceCharacter(lexer);
     }
@@ -207,31 +241,46 @@ void LexerSkipWhitespace(Lexer_T *lexer)
     }
 }
 
-void LexerGenerateAST(Lexer_T *lexer)
+Token_Node *LexerGetNextToken(Lexer_T *lexer)
 {
-    AST_Node *Node = ASTGetNextNode(lexer);
+    LexerSkipWhitespace(lexer);
 
-    while (Node->Type != TOKEN_EOF)
+    while (LexerPeekOffset(lexer, 1) != '\0')
     {
-        if (Node->Type == TOKEN_ID)
-        {
-            if (strcmp(Node->value, "construct") == 0) {/* Function definition */}
-        }
+        //printf("S: %d A: %d D: %d\n", isspace(lexer->c), isalpha(lexer->c), isdigit(lexer->c));
 
-        if (Node->Type == TOKEN_BFUNC)
-        {
-            //printf("V: '%s', D: '%s' A: '%s'\n", Node->value, Node->_dest, Node->_arg);
+        if (lexer->c == 13 || lexer->c == 10 || lexer->c == ' ' || lexer->c == '\t') {LexerAdvanceCharacter(lexer); continue;}
 
-            if (strcmp(Node->value, "io") == 0)
+        if (isalpha(lexer->c) != 0) {return InitializeToken(LexerAdvanceWithId(lexer), TOKEN_ID);}
+        if (isdigit(lexer->c) != 0) {return InitializeToken(LexerAdvanceWithDigit(lexer), TOKEN_DIGIT);}
+
+        if (isspace(lexer->c) == 0 && isalpha(lexer->c) == 0 && isdigit(lexer->c) == 0)
+        {
+            switch (lexer->c)
             {
-                if (strcmp(Node->_dest, "print") == 0)
-                {
-                    printf("%s", Node->_arg);
-                }
+                case '!': {LexerAdvanceCharacter(lexer); return InitializeToken("!", TOKEN_EXCL);}
+                case '@': {LexerAdvanceCharacter(lexer); return InitializeToken("@", TOKEN_AT);}
+                case '#': {LexerAdvanceCharacter(lexer); return InitializeToken("#", TOKEN_HASHTAG);}
+                case '$': {LexerAdvanceCharacter(lexer); return InitializeToken("$", TOKEN_DOLLAR);}
+                case '%': {LexerAdvanceCharacter(lexer); return InitializeToken("%", TOKEN_PERCENT);}
+                case '^': {LexerAdvanceCharacter(lexer); return InitializeToken("^", TOKEN_UP);}
+                case '&': {LexerAdvanceCharacter(lexer); return InitializeToken("&", TOKEN_ZS);}
+                case '*': {LexerAdvanceCharacter(lexer); return InitializeToken("*", TOKEN_STAR);}
+                case '(': {LexerAdvanceCharacter(lexer); return InitializeToken("(", TOKEN_LPAREN);}
+                case ')': {LexerAdvanceCharacter(lexer); return InitializeToken(")", TOKEN_RPAREN);}
+                case '+': {LexerAdvanceCharacter(lexer); return InitializeToken("+", TOKEN_PLUS);}
+                case '=': {LexerAdvanceCharacter(lexer); return InitializeToken("=", TOKEN_IS);}
+                case '{': {LexerAdvanceCharacter(lexer); return InitializeToken("{", TOKEN_RBRACE);}
+                case '}': {LexerAdvanceCharacter(lexer); return InitializeToken("}", TOKEN_LBRACE);}
+                case ';': {LexerAdvanceCharacter(lexer); return InitializeToken(";", TOKEN_SEMICOLON);}
+                case '"': {LexerAdvanceCharacter(lexer); return InitializeToken(LexerAdvanceWithId(lexer), TOKEN_ID);}
+
+                default: InvalidSyntax(lexer->c, 1);
             }
         }
 
-        /* Node -> New Node */
-        Node = ASTGetNextNode(lexer);
+        LexerAdvanceCharacter(lexer);
     }
+
+    return InitializeToken("\0", TOKEN_EOF);
 }
