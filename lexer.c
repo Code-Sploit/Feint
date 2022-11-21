@@ -28,25 +28,13 @@ char LexerPeekOffset(Lexer_T *lexer, int _offset)
     return lexer->src[lexer->i + _offset];
 }
 
-char *LexerGetVal(Lexer_T *lexer, char _delim)
+char *LexerGetValue(Lexer_T *lexer)
 {
     char *value = calloc(1, sizeof(char));
 
-    while (LexerPeekOffset(lexer, 0) != _delim)
+    while (LexerPeekOffset(lexer, 0) != '"')
     {
         value = realloc(value, (strlen(value) + 2));
-
-        if (LexerPeekOffset(lexer, 0) == '\\' && LexerPeekOffset(lexer, 1) == 'n')
-        {
-            strcat(value, (char[]) {'\n', 0});
-
-            for (int i = 0; i < 2; i++)
-            {
-                LexerAdvanceCharacter(lexer);
-            }
-
-            continue;
-        }
 
         strcat(value, (char[]) {LexerPeekOffset(lexer, 0), 0});
 
@@ -164,43 +152,6 @@ void LexerSkipUntil(Lexer_T *lexer, char ch)
     LexerAdvanceOffset(lexer, 2);
 }
 
-char *LexerGetFunctionArg(Lexer_T *lexer)
-{
-    char *val = calloc(1, sizeof(char));
-
-    /* Skip alpha until over LPAREN */
-    LexerSkipUntil(lexer, '(');
-
-    LexerAdvanceCharacter(lexer);
-
-    if (LexerPeekOffset(lexer, 0) == '"')
-    {
-        /* String argument */
-
-        val = LexerGetVal(lexer, '"');
-    }
-    else if (isalpha(LexerPeekOffset(lexer, 0)) != 0)
-    {
-        /* Variable argument */
-
-    }
-    else
-    {
-        /* Int argument */
-
-        while (isdigit(LexerPeekOffset(lexer, 0) != 0))
-        {
-            val = realloc(val, (strlen(val) + 2));
-
-            strcat(val, (char[]) {LexerPeekOffset(lexer, 0), 0});
-
-            LexerAdvanceCharacter(lexer);
-        }
-    }
-
-    return val;
-}
-
 char *LexerAdvanceWithId(Lexer_T *lexer)
 {
     char *id = calloc(1, sizeof(id));
@@ -273,7 +224,7 @@ Token_Node *LexerGetNextToken(Lexer_T *lexer)
                 case '{': {LexerAdvanceCharacter(lexer); return InitializeToken("{", TOKEN_RBRACE);}
                 case '}': {LexerAdvanceCharacter(lexer); return InitializeToken("}", TOKEN_LBRACE);}
                 case ';': {LexerAdvanceCharacter(lexer); return InitializeToken(";", TOKEN_SEMICOLON);}
-                case '"': {LexerAdvanceCharacter(lexer); return InitializeToken(LexerAdvanceWithId(lexer), TOKEN_ID);}
+                case '"': {LexerAdvanceCharacter(lexer); return InitializeToken(LexerGetValue(lexer), TOKEN_ID);}
 
                 default: InvalidSyntax(lexer->c, 1);
             }
