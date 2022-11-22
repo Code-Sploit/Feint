@@ -37,7 +37,7 @@ char *ScopeExt(char *_e, char *_scope)
     return ret;
 }
 
-void WriteASMTo(char *_out, char *_start_function_data, char *_declarations)
+void WriteASMTo(char *_out, char *_start_function_data, char *_declarations, char **_functions, int _F_Count)
 {
     FILE *fp = fopen(_out, "w+");
 
@@ -51,6 +51,13 @@ void WriteASMTo(char *_out, char *_start_function_data, char *_declarations)
     char *_StandardDeclarations = "%define ENDL 0x0D, 0x0A\n";
 
     fputs(_StandardDeclarations, fp);
+
+    for (int i = 0; i < _F_Count; i++)
+    {
+        fputs(_functions[i], fp);
+    }
+
+    fputs("\n", fp);
 
     fputs(_start_function_data, fp);
     fputs(_declarations, fp);
@@ -78,6 +85,16 @@ void ASTGenerateMachineCode(Scope_T *_Scope, int _debug)
     char *_asm_rodata   = calloc(1, sizeof(char));
     char *_asm_start_f  = calloc(1, sizeof(char));
 
+    char *_asm_functions[256];
+
+    int _F_Count = 0;
+
+    /* Allocate array */
+    for (int i = 0; i < 256; i++)
+    {
+        _asm_functions[i] = calloc(1, sizeof(char));
+    }
+
     _asm_start_f = realloc(_asm_start_f, (strlen(_asm_start_f) + strlen("global _start\n\nsection .text\n\n_start:\n") + 1));
     _asm_rodata = realloc(_asm_rodata, (strlen(_asm_rodata) + strlen("\nsection .rodata\n") + 1));
 
@@ -103,8 +120,8 @@ void ASTGenerateMachineCode(Scope_T *_Scope, int _debug)
                 _asm_start_f = realloc(_asm_start_f, (strlen(_asm_start_f) + (strlen("mov rax, 60\nmov rdi,") + strlen(val) + strlen("\nsyscall\n") + 1)));
 
                 strcat(_asm_start_f, "mov rax, 60\nmov rdi, ");
-		strcat(_asm_start_f, val);
-		strcat(_asm_start_f, "\nsyscall\n");
+		        strcat(_asm_start_f, val);
+		        strcat(_asm_start_f, "\nsyscall\n");
 
                 if (_debug) {printf("%s\n", _asm_start_f);}
 
@@ -132,7 +149,6 @@ void ASTGenerateMachineCode(Scope_T *_Scope, int _debug)
                 strcat(_asm_rodata, ScopeExt(name, scope));
                 strcat(_asm_rodata, "\n");
 
-
                 if (_debug) {printf("%s\n", _asm_rodata);}
             }
 
@@ -159,17 +175,79 @@ void ASTGenerateMachineCode(Scope_T *_Scope, int _debug)
 
             if (Compare(name, "printvar"))
             {
-                _asm_start_f = realloc(_asm_start_f, (strlen(_asm_start_f) + strlen("mov rax, 1\nmov rdi, 1\nmov rsi, ") + strlen(val) + strlen("\nmov rdx, ") + strlen(LenExt(val)) + strlen("\nsyscall\n")) + 1);
+                if (Compare(scope, "main"))
+                {
+                    _asm_start_f = realloc(_asm_start_f, (strlen(_asm_start_f) + strlen("mov rax, 1\nmov rdi, 1\nmov rsi, ") + strlen(val) + strlen("\nmov rdx, ") + strlen(LenExt(val)) + strlen("\nsyscall\n")) + 1);
 
-                strcat(_asm_start_f, "mov rax, 1\nmov rdi, 1\nmov rsi, ");
-                strcat(_asm_start_f, ScopeExt(val, scope));
-                strcat(_asm_start_f, "\nmov rdx, ");
-                strcat(_asm_start_f, LenExt(val));
-                strcat(_asm_start_f, "\nsyscall\n");
+                    strcat(_asm_start_f, "mov rax, 1\nmov rdi, 1\nmov rsi, ");
+                    strcat(_asm_start_f, ScopeExt(val, scope));
+                    strcat(_asm_start_f, "\nmov rdx, ");
+                    strcat(_asm_start_f, LenExt(val));
+                    strcat(_asm_start_f, "\nsyscall\n");
 
-                if (_debug) {printf("%s\n", _asm_start_f);}
+                    if (_debug) {printf("%s\n", _asm_start_f);}
+                }
+                else
+                {
+                    _asm_functions[_F_Count] = realloc(_asm_functions[_F_Count], (strlen(_asm_functions[_F_Count]) + strlen(scope) + strlen(":\nmov rax, 1\nmov rdi, 1\nmov rsi, ") + strlen(val) + strlen("\nmov rdx, ") + strlen(LenExt(val)) + strlen("\nsyscall\n")) + 1);
+
+                    strcat(_asm_functions[_F_Count], scope);
+                    strcat(_asm_functions[_F_Count], ":\nmov rax, 1\nmov rdi, 1\nmov rsi, ");
+                    strcat(_asm_functions[_F_Count], ScopeExt(val, scope));
+                    strcat(_asm_functions[_F_Count], "\nmov rdx, ");
+                    strcat(_asm_functions[_F_Count], LenExt(val));
+                    strcat(_asm_functions[_F_Count], "\nsyscall\n");
+
+                    if (_debug) {printf("%s\n", _asm_functions[_F_Count]);}
+                }
+            }
+
+            if (Compare(name, "call"))
+            {
+                if (Compare(scope, "main"))
+                {
+                    _asm_start_f = realloc(_asm_start_f, (strlen(_asm_start_f) + strlen("call ") + strlen(val) + strlen("\n") + 1));
+
+                    strcat(_asm_start_f, "call ");
+                    strcat(_asm_start_f, val);
+                    strcat(_asm_start_f, "\n");
+                    
+                    if (_debug) {printf("%s\n", _asm_start_f);}
+                }
+                else
+                {
+                    _asm_functions[_F_Count] = realloc(_asm_functions[_F_Count], (strlen(_asm_functions[_F_Count] + strlen("call ") + strlen(val) + strlen("\n") + 1)));
+
+                    strcat(_asm_functions[_F_Count], "call ");
+                    strcat(_asm_functions[_F_Count], val);
+                    strcat(_asm_functions[_F_Count], "\n");
+
+                    if (_debug) {printf("%s\n", _asm_functions[_F_Count]);}
+                }
+            }
+
+            if (Compare(name, "back"))
+            {
+                if (Compare(scope, "main"))
+                {
+                    _asm_start_f = realloc(_asm_start_f, (strlen(_asm_start_f) + strlen("ret\n") + 1));
+
+                    strcat(_asm_start_f, "ret\n");
+
+                    if (_debug) {printf("%s\n", _asm_start_f);}
+                }
+                else
+                {
+                    _asm_functions[_F_Count] = realloc(_asm_functions[_F_Count], (strlen(_asm_functions[_F_Count]) + strlen("ret\n") + 1));
+
+                    strcat(_asm_functions[_F_Count], "ret\n");
+
+                    if (_debug) {printf("%s\n", _asm_functions[_F_Count]);}
+                }
             }
         }
+
+        _F_Count++;
 
         if (!Compare(otype, "EXPR") && !Compare(otype, "STATEMENT"))
         {
@@ -179,5 +257,5 @@ void ASTGenerateMachineCode(Scope_T *_Scope, int _debug)
         }
     }
 
-    WriteASMTo("output.s", _asm_start_f, _asm_rodata);
+    WriteASMTo("output.s", _asm_start_f, _asm_rodata, _asm_functions, _F_Count);
 }
