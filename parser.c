@@ -104,6 +104,12 @@ Scope_T *ParserCompile(Lexer_T *lexer, int _debug)
 
                     if (_debug) {printf("Found function declaration: Name: '%s'\n", _fname->_value);}
                 }
+                else
+                {
+                    /* Other function */
+
+                    if (_debug) {printf("Found function declaration: Name: '%s'\n", _fname->_value);}
+                }
 
                 while (!MatchExpr(CurToken->_value, "{"))
                 {
@@ -140,7 +146,7 @@ Scope_T *ParserCompile(Lexer_T *lexer, int _debug)
 
                     if (MatchExpr(CurToken->_value, "str"))
                     {
-                        Token_Node *_type  = InitializeToken("str", TOKEN_INT);
+                        Token_Node *_type  = InitializeToken("str", TOKEN_STR);
 
                         /* Next token should be variable name */
                         Token_Node *_name  = LexerGetNextToken(lexer);
@@ -172,7 +178,7 @@ Scope_T *ParserCompile(Lexer_T *lexer, int _debug)
 
                         _TokensAdded++;
 
-                        if (_debug) {printf("\nFound printvar() function call: Accessed variable: '%s'\n", _NAME->_value);}
+                        if (_debug) {printf("\nFound printvar() function call: Accessed variable: '%s' Scope: '%s'\n", _NAME->_value, _CurrentScope);}
 
                         CurToken = LexerGetNextToken(lexer);
 
@@ -190,6 +196,38 @@ Scope_T *ParserCompile(Lexer_T *lexer, int _debug)
                         _TokensAdded++;
 
                         if (_debug) {printf("\nFound return statement: Returns: '%s'\n\n", _ret);}
+
+                        CurToken = LexerGetNextToken(lexer);
+
+                        continue;
+                    }
+
+                    if (MatchExpr(CurToken->_value, "back"))
+                    {
+                        Scope_Node *_Node = InitializeScopeNode("void", "back", " ", " ", _CurrentScope, "EXPR");
+
+                        _MainTokens[_TokensAdded] = _Node;
+
+                        _TokensAdded++;
+
+                        if (_debug) {printf("\nFound back statement: Back: '%s'\n\n", _CurrentScope);}
+
+                        CurToken = LexerGetNextToken(lexer);
+
+                        continue;
+                    }
+
+                    if (MatchExpr(CurToken->_value, "call"))
+                    {
+                        char *_ret = LexerGetNextToken(lexer)->_value;
+
+                        Scope_Node *_Node = InitializeScopeNode("void", "call", " ", _ret, _CurrentScope, "EXPR");
+
+                        _MainTokens[_TokensAdded] = _Node;
+
+                        _TokensAdded++;
+
+                        if (_debug) {printf("\nFound function call: Calls: '%s'\n\n", _ret);}
 
                         CurToken = LexerGetNextToken(lexer);
 
