@@ -27,6 +27,7 @@ typedef struct TOKEN_STRUCT {
         TOKEN_IS,
         TOKEN_SEMICOLON,
         TOKEN_BFUNC,
+        TOKEN_COMMA,
         TOKEN_EOF
     } Type;
 } Token_Node;
