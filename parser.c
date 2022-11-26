@@ -199,7 +199,9 @@ Scope_T *ParserCompile(Lexer_T *lexer, int _debug)
 
                         CurToken = LexerGetNextToken(lexer);
 
-                        continue;
+                        /* Break because return statement in main function */
+
+                        break;
                     }
 
                     if (MatchExpr(CurToken->_value, "back"))
@@ -231,6 +233,150 @@ Scope_T *ParserCompile(Lexer_T *lexer, int _debug)
 
                         CurToken = LexerGetNextToken(lexer);
 
+                        continue;
+                    }
+
+                    if (MatchExpr(CurToken->_value, "sum"))
+                    {
+                        /* Skip the LPAREN */
+
+                        for (int i = 0; i < 1; i++)
+                        {
+                            CurToken = LexerGetNextToken(lexer);
+                        }
+
+                        Token_Node *__A  = LexerGetNextToken(lexer); /* First variable */
+                        Token_Node *__C1 = LexerGetNextToken(lexer); /* Comma token (1) */
+                        Token_Node *__B  = LexerGetNextToken(lexer); /* Second variable */
+                        Token_Node *__C2 = LexerGetNextToken(lexer); /* Comma token (2) */
+                        Token_Node *__C  = LexerGetNextToken(lexer); /* Result variable */
+
+                        /* Skip the RPAREN */
+                        for (int i = 0; i < 1; i++)
+                        {
+                            CurToken = LexerGetNextToken(lexer);
+                        }
+
+                        Scope_Node *_Summation = InitializeScopeNode("sum", __A->_value, "+", __B->_value, _CurrentScope, "ARG");
+
+                        _Summation->_second_argument = __C->_value;
+
+                        _MainTokens[_TokensAdded] = _Summation;
+
+                        _TokensAdded++;
+
+                        if (_debug) {printf("\nFound summation: SYSLOG: 'Yes' Add: '%s' To: '%s' -> Console!\n", __B->_value, __A->_value);}
+
+                        CurToken = LexerGetNextToken(lexer);
+                        
+                        continue;
+                    }
+
+                    if (MatchExpr(CurToken->_value, "sub"))
+                    {
+                        /* Skip the LPAREN */
+
+                        for (int i = 0; i < 1; i++)
+                        {
+                            CurToken = LexerGetNextToken(lexer);
+                        }
+
+                        Token_Node *__A  = LexerGetNextToken(lexer); /* First variable */
+                        Token_Node *__C1 = LexerGetNextToken(lexer); /* Comma token (1) */
+                        Token_Node *__B  = LexerGetNextToken(lexer); /* Second variable */
+                        Token_Node *__C2 = LexerGetNextToken(lexer); /* Comma token (2) */
+                        Token_Node *__C  = LexerGetNextToken(lexer); /* Result variable */
+
+                        /* Skip the RPAREN */
+                        for (int i = 0; i < 1; i++)
+                        {
+                            CurToken = LexerGetNextToken(lexer);
+                        }
+
+                        Scope_Node *_Subtraction = InitializeScopeNode("sub", __A->_value, "-", __B->_value, _CurrentScope, "ARG");
+
+                        _Subtraction->_second_argument = __C->_value;
+
+                        _MainTokens[_TokensAdded] = _Subtraction;
+
+                        _TokensAdded++;
+
+                        if (_debug) {printf("\nFound subtraction: SYSLOG: 'Yes' Subtract: '%s' From: '%s' -> Console!\n", __B->_value, __A->_value);}
+
+                        CurToken = LexerGetNextToken(lexer);
+                        
+                        continue;
+                    }
+
+                    if (MatchExpr(CurToken->_value, "mul"))
+                    {
+                        /* Skip the LPAREN */
+
+                        for (int i = 0; i < 1; i++)
+                        {
+                            CurToken = LexerGetNextToken(lexer);
+                        }
+
+                        Token_Node *__A  = LexerGetNextToken(lexer); /* First variable */
+                        Token_Node *__C1 = LexerGetNextToken(lexer); /* Comma token (1) */
+                        Token_Node *__B  = LexerGetNextToken(lexer); /* Second variable */
+                        Token_Node *__C2 = LexerGetNextToken(lexer); /* Comma token (2) */
+                        Token_Node *__C  = LexerGetNextToken(lexer); /* Result variable */
+
+                        /* Skip the RPAREN */
+                        for (int i = 0; i < 1; i++)
+                        {
+                            CurToken = LexerGetNextToken(lexer);
+                        }
+
+                        Scope_Node *_Multiplication = InitializeScopeNode("mul", __A->_value, "*", __B->_value, _CurrentScope, "ARG");
+
+                        _Multiplication->_second_argument = __C->_value;
+
+                        _MainTokens[_TokensAdded] = _Multiplication;
+
+                        _TokensAdded++;
+
+                        if (_debug) {printf("\nFound multiplication: SYSLOG: 'Yes' Multiply: '%s' With: '%s' -> Console!\n", __B->_value, __A->_value);}
+
+                        CurToken = LexerGetNextToken(lexer);
+                        
+                        continue;
+                    }
+
+                    if (MatchExpr(CurToken->_value, "div"))
+                    {
+                        /* Skip the LPAREN */
+
+                        for (int i = 0; i < 1; i++)
+                        {
+                            CurToken = LexerGetNextToken(lexer);
+                        }
+
+                        Token_Node *__A  = LexerGetNextToken(lexer); /* First variable */
+                        Token_Node *__C1 = LexerGetNextToken(lexer); /* Comma token (1) */
+                        Token_Node *__B  = LexerGetNextToken(lexer); /* Second variable */
+                        Token_Node *__C2 = LexerGetNextToken(lexer); /* Comma token (2) */
+                        Token_Node *__C  = LexerGetNextToken(lexer); /* Result variable */
+
+                        /* Skip the RPAREN */
+                        for (int i = 0; i < 1; i++)
+                        {
+                            CurToken = LexerGetNextToken(lexer);
+                        }
+
+                        Scope_Node *_Division = InitializeScopeNode("div", __A->_value, "/", __B->_value, _CurrentScope, "ARG");
+
+                        _Division->_second_argument = __C->_value;
+
+                        _MainTokens[_TokensAdded] = _Division;
+
+                        _TokensAdded++;
+
+                        if (_debug) {printf("\nFound division: SYSLOG: 'Yes' Divide: '%s' By: '%s' -> Console!\n", __B->_value, __A->_value);}
+
+                        CurToken = LexerGetNextToken(lexer);
+                        
                         continue;
                     }
 
