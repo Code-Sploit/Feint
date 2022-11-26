@@ -7,6 +7,8 @@ typedef struct SCOPE_NODE_STRUCT {
     char *_value;
     char *_scope;
     char *_otype;
+
+    char *_second_argument;
 } Scope_Node;
 
 typedef struct SCOPE_STRUCT {
