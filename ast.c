@@ -3,6 +3,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
+
+char *IntToStr(int _N)
+{
+    char *NewStr = calloc(1, sizeof(char));
+
+    sprintf(NewStr, "%d", _N);
+
+    return NewStr;
+}
 
 int Compare(char *_e1, char *_e2)
 {
@@ -35,6 +45,132 @@ char *ScopeExt(char *_e, char *_scope)
     strcat(ret, _e);
 
     return ret;
+}
+
+char *AccessVariable(char *_odata, char *_vname)
+{
+    if (strcmp(_odata, "") == 0) {return _odata;}
+
+    char *_oname = calloc(1, sizeof(char));
+    char *_nval  = calloc(1, sizeof(char));
+
+    int _loop = 0;
+
+    while (_loop <= strlen(_odata))
+    {
+        while (isalpha(_odata[_loop]) != 0 || _odata[_loop] == '_')
+        {
+            _oname = realloc(_oname, (strlen(_oname) + 2));
+
+            strcat(_oname, (char[]) {_odata[_loop], 0});
+
+            _loop++;
+        }
+
+        if (strcmp(_oname, _vname) == 0)
+        {
+            /* We found the variable we needed to visit now let's get the actual value */
+
+            _loop++;
+
+            while (_odata[_loop] != '"')
+            {
+                _loop++;
+            }
+
+            _loop++;
+
+            while (_odata[_loop] != '"')
+            {
+                _nval = realloc(_nval, (strlen(_nval) + 2));
+
+                strcat(_nval, (char[]) {_odata[_loop], 0});
+
+                _loop++;
+            }
+
+            break;
+        }
+
+        _loop++;
+
+        memset(_oname, 0, strlen(_oname));
+    }
+
+    return _nval;
+}
+
+char *UpdateROData(char *_odata, char *_vname, char *_nval)
+{   
+    if (strcmp(_odata, "") == 0) {return _odata;}
+
+    char *_oname = calloc(1, sizeof(char));
+    char *_ndata = calloc(1, sizeof(char));
+
+    int _loop = 0;
+
+    while (_loop <= strlen(_odata))
+    {
+        while (isalpha(_odata[_loop]) != 0 || _odata[_loop] == '_')
+        {
+            _oname = realloc(_oname, (strlen(_oname) + 1));
+
+            strcat(_oname, (char[]) {_odata[_loop], 0});
+
+            _loop++;
+        }
+
+        if (strcmp(_vname, _oname) == 0)
+        {
+            //printf("Found variable! V: '%s' O: '%s'\n", _vname, _oname);
+            /* Change the line */
+            _ndata = realloc(_ndata, (strlen(_ndata) + strlen(_vname) + strlen(": db \"") + strlen(_nval) + strlen("\", ENDL\n") + 1));
+
+            strcat(_ndata, _vname);
+            strcat(_ndata, ": db \"");
+            strcat(_ndata, _nval);
+            strcat(_ndata, "\", ENDL");
+
+            /* Skip until next line */
+            while (_odata[_loop] != '\n')
+            {
+                _loop++;
+            }
+        }
+        else
+        {
+            /* First add the word that was not our variable but still add it because it was another */
+            _ndata = realloc(_ndata, (strlen(_ndata) + strlen(_oname) + 1));
+
+            strcat(_ndata, _oname);
+
+            /* Get all data until '\n' symbol and add to _ndata */
+            while (_odata[_loop] != '\n')
+            {
+                _ndata = realloc(_ndata, (strlen(_ndata) + 1));
+
+                strcat(_ndata, (char[]) {_odata[_loop], 0});
+
+                _loop++;
+            }
+        }
+
+        _ndata = realloc(_ndata, (strlen(_ndata) + 2));
+
+        strcat(_ndata, (char[]) {_odata[_loop], 0});
+
+        _loop++;
+
+        /* Reset _oname string */
+        memset(_oname, 0, strlen(_oname));
+    }
+
+    /* Remove weird end line */
+    char *wline = strchr(_ndata, '!');
+
+    if (wline != NULL) {*wline = '\0';}
+
+    return _ndata;
 }
 
 void WriteASMTo(char *_out, char *_start_function_data, char *_declarations, char **_functions, int _F_Count)
@@ -247,9 +383,56 @@ void ASTGenerateMachineCode(Scope_T *_Scope, int _debug)
             }
         }
 
+        if (Compare(otype, "ARG"))
+        {
+            if (Compare(type, "sum"))
+            {
+                int _A = atoi(AccessVariable(_asm_rodata, ScopeExt(name, scope)));
+                int _B = atoi(AccessVariable(_asm_rodata, ScopeExt(val, scope)));
+                int _R = _A + _B;
+
+                _asm_rodata = UpdateROData(_asm_rodata, ScopeExt(_Scope->Tokens[i]->_second_argument, scope), IntToStr(_R));
+
+                if (_debug) {printf("%s\n", _asm_rodata);}
+            }
+
+            if (Compare(type, "sub"))
+            {
+                int _A = atoi(AccessVariable(_asm_rodata, ScopeExt(name, scope)));
+                int _B = atoi(AccessVariable(_asm_rodata, ScopeExt(val, scope)));
+                int _R = _A - _B;
+
+                _asm_rodata = UpdateROData(_asm_rodata, ScopeExt(_Scope->Tokens[i]->_second_argument, scope), IntToStr(_R));
+
+                if (_debug) {printf("%s\n", _asm_rodata);}
+            }
+
+            if (Compare(type, "mul"))
+            {
+                int _A = atoi(AccessVariable(_asm_rodata, ScopeExt(name, scope)));
+                int _B = atoi(AccessVariable(_asm_rodata, ScopeExt(val, scope)));
+                int _R = _A * _B;
+
+                _asm_rodata = UpdateROData(_asm_rodata, ScopeExt(_Scope->Tokens[i]->_second_argument, scope), IntToStr(_R));
+
+                if (_debug) {printf("%s\n", _asm_rodata);}
+            }
+
+            if (Compare(type, "div"))
+            {
+                int _A = atoi(AccessVariable(_asm_rodata, ScopeExt(name, scope)));
+                int _B = atoi(AccessVariable(_asm_rodata, ScopeExt(val, scope)));
+                int _R = _A / _B;
+
+                _asm_rodata = UpdateROData(_asm_rodata, ScopeExt(_Scope->Tokens[i]->_second_argument, scope), IntToStr(_R));
+
+                if (_debug) {printf("%s\n", _asm_rodata);}
+            }
+        }
+
         _F_Count++;
 
-        if (!Compare(otype, "EXPR") && !Compare(otype, "STATEMENT"))
+        if (!Compare(otype, "EXPR") && !Compare(otype, "STATEMENT") && !(Compare(otype, "ARG")))
         {
             printf("Critical error: [Invalid expression in ASM Generation!]\n");
 
