@@ -223,6 +223,7 @@ Token_Node *LexerGetNextToken(Lexer_T *lexer)
                 case '{': {LexerAdvanceCharacter(lexer); return InitializeToken("{", TOKEN_RBRACE);}
                 case '}': {LexerAdvanceCharacter(lexer); return InitializeToken("}", TOKEN_LBRACE);}
                 case ';': {LexerAdvanceCharacter(lexer); return InitializeToken(";", TOKEN_SEMICOLON);}
+                case ',': {LexerAdvanceCharacter(lexer); return InitializeToken(",", TOKEN_COMMA);}
                 case '"': {LexerAdvanceCharacter(lexer); return InitializeToken(LexerGetValue(lexer), TOKEN_ID);}
 
                 default: InvalidSyntax(lexer->c, 1);
