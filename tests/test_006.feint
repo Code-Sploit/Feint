@@ -1,0 +1,11 @@
+construct main {
+  int a = 10;
+  int b = 4;
+  int r = 0;
+  
+  sub(a,b,r);
+  
+  printvar(r);
+  
+  return 0;
+}
