@@ -5,6 +5,8 @@ BUILDDIR=build
 
 all: feintc
 
+.PHONY: tools
+
 feintc:
 	mkdir -p build
 	$(CC) $(CFLAGS) feint.c -o $(BUILDDIR)/feint.o
@@ -16,8 +18,12 @@ feintc:
 	$(CC) -o feintc $(BUILDDIR)/feint.o $(BUILDDIR)/lexer.o $(BUILDDIR)/ast.o $(BUILDDIR)/token.o $(BUILDDIR)/parser.o $(BUILDDIR)/main.o
 
 clean:
-	rm -f build/*
-	rm -f feintc
+	rm -rf build
+	rm -rf feintc
+	rm -rf tools/test_compilation_process
+
+tools:
+	$(CC) -o tools/test_compilation_process tools/test_compilation_process.c
 
 debug:
 	mkdir -p build
@@ -29,5 +35,5 @@ debug:
 	$(CC) $(GFLAGS) main.c -o $(BUILDDIR)/main.o
 	$(CC) -o feintc $(BUILDDIR)/feint.o $(BUILDDIR)/lexer.o $(BUILDDIR)/ast.o $(BUILDDIR)/token.o $(BUILDDIR)/parser.o $(BUILDDIR)/main.o
 
-remake:
+compile:
 	make clean && make
