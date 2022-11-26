@@ -16,7 +16,7 @@
 *Ubuntu/Debian*<br>
 `sudo apt install make nasm gcc`<br>
 
-*Arch/Manjoro*<br>
+*Arch/Manjaro*<br>
 `sudo pacman -S base-devel nasm`<br>
 
 #### *Clone the github repository*<br>
