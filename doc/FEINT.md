@@ -53,6 +53,7 @@ construct main {
   ...
   
   return yourreturnvalue;
+}
 ```
 
 **Defining a variable:**<br>
