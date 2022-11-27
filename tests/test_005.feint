@@ -3,7 +3,7 @@ construct main {
   int b = 4;
   int r = 0;
   
-  add(a,b,r);
+  sum(a,b,r);
   
   printvar(r);
   
