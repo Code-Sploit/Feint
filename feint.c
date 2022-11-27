@@ -6,6 +6,10 @@
 
 int FeintCompile(char *InFile, char *CompilerArguments, int _Bytes)
 {
+    PSyntaxCheck(InFile);
+
+    printf("\nStarting compilation process!... Targets: [\033[0;36m%s\033[0m]\n", InFile);
+
     FILE *InputPointer;
 
     if (_Bytes == 0) {InputPointer = fopen(InFile, "r");}
