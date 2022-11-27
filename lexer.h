@@ -7,6 +7,8 @@ typedef struct LEXER_STRUCT {
     unsigned int i;
 } Lexer_T;
 
+int MatchExpr(char *_e1, char *_e2);
+
 Lexer_T *InitializeLexer(char *src);
 
 char LexerPeekOffset(Lexer_T *lexer, int _offset);
