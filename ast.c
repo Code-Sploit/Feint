@@ -175,11 +175,18 @@ char *UpdateROData(char *_odata, char *_vname, char *_nval)
 
 void WriteASMTo(char *_out, char *_start_function_data, char *_declarations, char **_functions, int _F_Count)
 {
-    FILE *fp = fopen(_out, "w+");
+    char *_out_s = calloc(1, sizeof(char));
+
+    _out_s = realloc(_out_s, (strlen(_out_s) + strlen(".s")) + 1);
+
+    strcat(_out_s, _out);
+    strcat(_out_s, ".s");
+
+    FILE *fp = fopen(_out_s, "w+");
 
     if (!fp)
     {
-        printf("Error could not open '%s' for output asm code!\n");
+        printf("Error could not open '%s' for output asm code!\n", _out_s);
 
         exit(1);
     }
@@ -203,11 +210,20 @@ void WriteASMTo(char *_out, char *_start_function_data, char *_declarations, cha
     char *_nasm_cmd = calloc(1, sizeof(char));
     char *_link_cmd = calloc(1, sizeof(char));
 
-    _nasm_cmd = realloc(_nasm_cmd, (strlen(_nasm_cmd) + strlen("nasm -f elf64 -o output.out output.s") + 1));
-    _link_cmd = realloc(_link_cmd, (strlen(_link_cmd) + strlen("ld output.out -o output") + 1));
+    _nasm_cmd = realloc(_nasm_cmd, (strlen(_nasm_cmd) + strlen("nasm -f elf64 -o ") + (2 * strlen(_out)) + strlen(".out") + strlen(" .s") + 1));
+    _link_cmd = realloc(_link_cmd, (strlen(_link_cmd) + strlen("ld ") + (2 * strlen(_out)) + strlen("-o .s") + 1));
 
-    strcat(_nasm_cmd, "nasm -f elf64 -o output.out output.s");
-    strcat(_link_cmd, "ld output.out -o output");
+    strcat(_nasm_cmd, "nasm -f elf64 -o ");
+    strcat(_nasm_cmd, _out);
+    strcat(_nasm_cmd, ".out ");
+    strcat(_nasm_cmd, _out);
+    strcat(_nasm_cmd, ".s");
+
+    strcat(_link_cmd, "ld ");
+    strcat(_link_cmd, _out);
+    strcat(_link_cmd, ".out");
+    strcat(_link_cmd, " -o ");
+    strcat(_link_cmd, _out);
 
     int _nasm = system(_nasm_cmd);
     int _link = system(_link_cmd);
@@ -216,7 +232,7 @@ void WriteASMTo(char *_out, char *_start_function_data, char *_declarations, cha
     if (_link == 1) {printf("\n\nError while running LD of Assembled output!\n");}
 }
 
-void ASTGenerateMachineCode(Scope_T *_Scope, int _debug)
+void ASTGenerateMachineCode(Scope_T *_Scope, char *OFile, int _debug)
 {
     char *_asm_rodata   = calloc(1, sizeof(char));
     char *_asm_start_f  = calloc(1, sizeof(char));
@@ -440,5 +456,5 @@ void ASTGenerateMachineCode(Scope_T *_Scope, int _debug)
         }
     }
 
-    WriteASMTo("output.s", _asm_start_f, _asm_rodata, _asm_functions, _F_Count);
+    WriteASMTo(OFile, _asm_start_f, _asm_rodata, _asm_functions, _F_Count);
 }
