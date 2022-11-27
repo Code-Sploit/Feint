@@ -12,14 +12,6 @@ void BadSyntax(char *_msg, int _ret)
     exit(_ret);
 }
 
-int MatchExpr(char *_e1, char *_e2)
-{
-    if (strcmp(_e1, _e2) == 0) { return 1;}
-    if (strcmp(_e1, _e2) != 0) { return 0;}
-
-    return 0;
-}
-
 int MatchExprAny(char *_e)
 {
     return 1;
