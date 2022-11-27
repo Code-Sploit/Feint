@@ -94,7 +94,7 @@ call yourfunction();
 *Important: All variables mentioned here need to be initialized*<br>
 
 ```
-add(a,b,r); ----> Add the value of 'b' to the value of 'a' and store the result in the variable r
+sum(a,b,r); ----> Add the value of 'b' to the value of 'a' and store the result in the variable r
 sub(a,b,r); ----> Subtract the value of 'b' to from value of 'a' and store the result in the variable r
 mul(a,b,r); ----> Multiply the value of 'b' with the value of 'a' and store the result in the variable r
 div(a,b,r); ----> Divide the value of 'a' with the value of 'b' and store the result in the variable r
