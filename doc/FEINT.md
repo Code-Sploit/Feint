@@ -106,5 +106,7 @@ div(a,b,r); ----> Divide the value of 'a' with the value of 'b' and store the re
 ```
 make tools
 
+chmod +x ./runtools.sh
+
 ./runtools.sh tests
 ```
