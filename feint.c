@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 
-int FeintCompile(char *InFile, char *CompilerArguments, int _Bytes)
+int FeintCompile(char *InFile, char *CompilerArguments, char *OFile, int _Bytes)
 {
     PSyntaxCheck(InFile);
 
@@ -39,7 +39,7 @@ int FeintCompile(char *InFile, char *CompilerArguments, int _Bytes)
 
     Scope_T *_MainScope = ParserCompile(lexer, atoi(CompilerArguments));
 
-    ASTGenerateMachineCode(_MainScope, atoi(CompilerArguments));
+    ASTGenerateMachineCode(_MainScope, OFile, atoi(CompilerArguments));
 
     return 0;
 }
