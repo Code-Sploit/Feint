@@ -19,7 +19,7 @@ void _EMSG(char *_M, char *_E)
 
 void _WMSG(char *_W)
 {
-    printf("W: '%s'\n", _W);
+    printf("\033[1;31mW: '%s'\033[0m\n", _W);
 }
 
 void PSyntaxCheck(char *FName)
