@@ -8,7 +8,7 @@ int FeintCompile(char *InFile, char *CompilerArguments, char *OFile, int _Bytes)
 {
     PSyntaxCheck(InFile);
 
-    printf("\nStarting compilation process!... Targets: [\033[0;36m%s\033[0m]\n", InFile);
+    printf("\nStarting compilation process!... Targets: [\033[1;36m%s\033[0m]\n", InFile);
 
     FILE *InputPointer;
 
