@@ -111,7 +111,7 @@ char *UpdateROData(char *_odata, char *_vname, char *_nval)
 
     while (_loop <= strlen(_odata))
     {
-        while (isalpha(_odata[_loop]) != 0 || _odata[_loop] == '_')
+        while (isalpha(_odata[_loop]) != 0 || _odata[_loop] == '_' || _odata[_loop] == '.')
         {
             _oname = realloc(_oname, (strlen(_oname) + 1));
 
@@ -122,7 +122,6 @@ char *UpdateROData(char *_odata, char *_vname, char *_nval)
 
         if (strcmp(_vname, _oname) == 0)
         {
-            //printf("Found variable! V: '%s' O: '%s'\n", _vname, _oname);
             /* Change the line */
             _ndata = realloc(_ndata, (strlen(_ndata) + strlen(_vname) + strlen(": db \"") + strlen(_nval) + strlen("\", ENDL\n") + 1));
 
@@ -137,21 +136,37 @@ char *UpdateROData(char *_odata, char *_vname, char *_nval)
                 _loop++;
             }
         }
-        else
+        else if (strcmp(_vname, "section") == 0)
         {
-            /* First add the word that was not our variable but still add it because it was another */
-            _ndata = realloc(_ndata, (strlen(_ndata) + strlen(_oname) + 1));
+            _ndata = realloc(_ndata, (strlen(_ndata) + strlen("section .rodata\n")) + 1);
 
-            strcat(_ndata, _oname);
+            strcat(_ndata, "section .rodata\n");
 
-            /* Get all data until '\n' symbol and add to _ndata */
+            /* Skip until next line */
             while (_odata[_loop] != '\n')
             {
-                _ndata = realloc(_ndata, (strlen(_ndata) + 1));
-
-                strcat(_ndata, (char[]) {_odata[_loop], 0});
-
                 _loop++;
+            }
+        }
+        else
+        {
+            /* Is the word valid? */
+            if (_odata[_loop] == ':')
+            {
+                /* First add the word that was not our variable but still add it because it was another */
+                _ndata = realloc(_ndata, (strlen(_ndata) + strlen(_oname) + 1));
+
+                strcat(_ndata, _oname);
+
+                /* Get all data until '\n' symbol and add to _ndata */
+                while (_odata[_loop] != '\n')
+                {
+                    _ndata = realloc(_ndata, (strlen(_ndata) + 1));
+
+                    strcat(_ndata, (char[]) {_odata[_loop], 0});
+
+                    _loop++;
+                }
             }
         }
 
