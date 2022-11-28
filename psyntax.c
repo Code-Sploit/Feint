@@ -111,7 +111,7 @@ void PSyntaxCheck(char *FName)
                     T = LexerGetNextToken(lexer);
                 }
 
-                if (strcmp(T->_value, "}") != 0)
+                if (strcmp(T->_value, "}") == 0)
                 {
                     _WMSG("FeintC forbids declaration of empty main function!");
 
