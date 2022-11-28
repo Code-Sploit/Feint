@@ -12,6 +12,16 @@ void ThrowError(char *_tval, int _ind, int _ttype)
     printf("Critical error: Index [%d] of line containing: [%s]!\n", _ind, _tval);
 }
 
+void _EMSG(char *_M, char *_E)
+{
+    printf("Expected '%s' before '%s'!\n", _M, _E);
+}
+
+void _WMSG(char *_W)
+{
+    printf("W: '%s'\n", _W);
+}
+
 void PSyntaxCheck(char *FName)
 {
     FILE *fp = fopen(FName, "r");
@@ -32,6 +42,7 @@ void PSyntaxCheck(char *FName)
 
     int _e = 0;
     int _l = 0;
+    int _w = 0;
 
     while ((Read = getline(&Line, &Length, fp)) != -1)
     {
@@ -80,9 +91,32 @@ void PSyntaxCheck(char *FName)
                     }
                 }
 
-                /* Skip the TOKEN_LBRACKET */
+                /* Check if next token is acctually a TOKEN_LBRACE */
 
                 T = LexerGetNextToken(lexer);
+
+                if (strcmp(T->_value, "{") != 0)
+                {
+                    _EMSG("{", T->_value);
+
+                    _e++;
+                }
+
+                /* If the next token is TOKEN_RBRACE give a warning */
+                
+                T = LexerGetNextToken(lexer);
+
+                if (strcmp(T->_value, "") == 0)
+                {
+                    T = LexerGetNextToken(lexer);
+                }
+
+                if (strcmp(T->_value, "}") != 0)
+                {
+                    _WMSG("FeintC forbids declaration of empty main function!");
+
+                    _w++;
+                }
 
                 continue;
             }
@@ -322,7 +356,7 @@ void PSyntaxCheck(char *FName)
         T = LexerGetNextToken(lexer);
     }
 
-    printf("\nProcessed \033[0;36m[%d] Total Lines.\033[0m Found \033[0;31m[%d] Errors\033[0m | Scanned File: \033[0;36m[%s]\033[0m!\n", _l, _e, FName);
+    printf("\nProcessed \033[1;36m[%d] Total Lines.\033[0m Found \033[1;31m[%d] Errors\033[0m and \033[1;33m[%d] Warnings\033[0m | Scanned File: \033[1;36m[%s]\033[0m!\n", _l, _e, _w, FName);
 
     if (_e > 0)
     {
