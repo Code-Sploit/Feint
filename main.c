@@ -8,17 +8,17 @@ void CompilationSuccessfull(char *File, char *OFile)
 {
     if (strcmp(OFile, "NULL") == 0)
     {
-        printf("\nCompilation of: [\033[0;36m%s\033[0m] \033[0;32msucceeded\033[0m!\n\nSaved executable file to: [\033[0;36m./output\033[0m]", File);
+        printf("\nCompilation of: [\033[1;36m%s\033[0m] \033[1;32msucceeded\033[0m!\n\nSaved executable file to: [\033[1;36m./output\033[0m]", File);
     }
     else
     {
-        printf("\nCompilation of: [\033[0;36m%s\033[0m] \033[0;32msucceeded\033[0m!\n\nSaved executable file to: [\033[0;36m./%s\033[0m]", File, OFile);
+        printf("\nCompilation of: [\033[1;36m%s\033[0m] \033[1;32msucceeded\033[0m!\n\nSaved executable file to: [\033[1;36m./%s\033[0m]", File, OFile);
     }
 }
 
 void CompilationUnSuccessfull(char *File)
 {
-    printf("\nCompilation of: [\033[0;36m%s\033[0m] \033[0;31mfailed\033[0m!\n", File);
+    printf("\nCompilation of: [\033[1;36m%s\033[0m] \033[1;31mfailed\033[0m!\n", File);
 }
 
 int main(int argc, char** argv)
