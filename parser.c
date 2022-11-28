@@ -46,26 +46,6 @@ Scope_Node *InitializeScopeNode(char *_type, char *_name, char *_oper, char *_va
     return NewNode;
 }
 
-char *DeclareVariable(char *_name, char *_oper, char *_value, char *_type)
-{
-    char *declaration = calloc(1, sizeof(char));
-
-    if (MatchExpr(_type, "str"))
-    {
-        char *template = "%s: db '%s', 0\n";
-
-        sprintf(declaration, template, _name, _value);
-    }
-    else if (MatchExpr(_type, "int"))
-    {
-        char *template = "mov edx, %s\n";
-
-        sprintf(declaration, template, _value);
-    }
-
-    return declaration;
-}
-
 Scope_T *ParserCompile(Lexer_T *lexer, int _debug)
 {
     Scope_Node *_MainTokens[256];
