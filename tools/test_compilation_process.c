@@ -46,13 +46,13 @@ int main(int argc, char** argv)
 
         if (FList[_n] == NULL) {break;}
 
-        _TCmd = realloc(_TCmd, (strlen(_TCmd) + strlen("./feintc ") + strlen(argv[1]) + strlen("/") + strlen(_FName) + strlen(" 0 > /dev/null") + 1));
+        _TCmd = realloc(_TCmd, (strlen(_TCmd) + strlen("./feintc ") + strlen(argv[1]) + strlen("/") + strlen(_FName) + strlen(" -o .temp 0 > /dev/null") + 1));
 
         strcat(_TCmd, "./feintc ");
         strcat(_TCmd, argv[1]);
         strcat(_TCmd, "/");
         strcat(_TCmd, _FName);
-        strcat(_TCmd, " 0 > /dev/null");
+        strcat(_TCmd, " -o .temp 0 > /dev/null");
 
         if (strcmp(_FName, ".") != 0 && strcmp(_FName, "..") != 0)
         {
@@ -82,6 +82,8 @@ int main(int argc, char** argv)
     printf("\nTest results: [%d]\033[0;36m Total\033[0m| [%d]\033[0;32m Passed\033[0m | [%d]\033[0;31m Failed\033[0m!\n", _t, _p, _f);
 
     free(FList);
+
+    system("rm -f .temp");
 
     return 0;
 }
