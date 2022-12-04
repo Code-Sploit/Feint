@@ -1,22 +1,4 @@
-construct foo {
-    str b_a = "Hello";
-
-    printvar(b_a);
-
-    back;
-}
-
-construct goo {
-    str a_b = "Hi";
-
-    printvar(a_b);
-    
-    back;
-}
-
-construct main {
-    call foo();
-    call goo();
+create main() {
     
     return 0;
 }
