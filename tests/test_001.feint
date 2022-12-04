@@ -1,6 +1,5 @@
-construct main {
+create main() {
     int a = 3;
-    str b = "Hi";
 
     return 0;
 }
