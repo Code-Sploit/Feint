@@ -1,10 +1,5 @@
 construct main {
-    int a = 3;
-    str b = "Hello World";
-    str testmessage = "This is a test message from the feint compiler!";
-
-    printvar(testmessage);
-    printvar(a);
-
+    stable int a = 3;
+    
     return 0;
 }
