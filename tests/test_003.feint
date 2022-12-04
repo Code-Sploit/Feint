@@ -1,11 +1,3 @@
-construct foo {
-    str b_a = "Hello";
-}
-
-construct main {
-    str t_a = "Hello, World!";
-
-    printvar(t_a);
-
+create main() {
     return 0;
 }
