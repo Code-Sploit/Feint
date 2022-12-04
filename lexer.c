@@ -200,6 +200,18 @@ void LexerSkipWhitespace(Lexer_T *lexer)
     }
 }
 
+Token_Node *LexerSkipToken(Lexer_T *lexer, int _count)
+{
+    Token_Node *tok = calloc(1, sizeof(Token_Node));
+
+    for (int i = 0; i < _count; i++)
+    {
+        tok = LexerGetNextToken(lexer);
+    }
+
+    return tok;
+}
+
 Token_Node *LexerGetNextToken(Lexer_T *lexer)
 {
     LexerSkipWhitespace(lexer);
