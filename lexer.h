@@ -20,3 +20,4 @@ void LexerSkipWhitespace(Lexer_T *lexer);
 void LexerAdvanceCharacter(Lexer_T *lexer);
 
 Token_Node *LexerGetNextToken(Lexer_T *lexer);
+Token_Node *LexerSkipToken(Lexer_T *lexer, int _count);
