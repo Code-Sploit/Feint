@@ -6,8 +6,6 @@
 
 int FeintCompile(char *InFile, char *CompilerArguments, char *OFile, int _Bytes)
 {
-    PSyntaxCheck(InFile);
-
     printf("\nStarting compilation process!... Targets: [\033[1;36m%s\033[0m]\n", InFile);
 
     FILE *InputPointer;
@@ -35,11 +33,24 @@ int FeintCompile(char *InFile, char *CompilerArguments, char *OFile, int _Bytes)
         strcat(FileContents, TempStorage);
     }
 
-    Lexer_T *lexer   = InitializeLexer(FileContents);
+    /* We have the file data so let's make an AST_T object */
+    AST_T *tree = GenerateASTTree(FileContents);
 
-    Scope_T *_MainScope = ParserCompile(lexer, atoi(CompilerArguments));
+    for (int i = 0; i < tree->_cc; i++)
+    {
+        printf("Variable type: (%d) stable: (%d) value: (%s)\n", tree->children[i]->vtype, tree->children[i]->_isstable, tree->children[i]->_vvalue);
+    }
 
-    ASTGenerateMachineCode(_MainScope, OFile, atoi(CompilerArguments));
+    /* Run a syntax check */
+    //SyntaxChecker(tree);
 
+    /* Seems like everything went well */
+    /* Generate ASM code */
+    GenerateASMCode(tree, OFile);
+
+    /* Assemble ASM code */
+    AssembleCode(OFile);
+
+    /* Done! */
     return 0;
 }
