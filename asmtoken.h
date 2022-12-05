@@ -1,14 +1,12 @@
 #ifndef SYNTAXES
 #define SYNTAXES
 
-#define SYNTAX_FUNCTION_DEFINITION "create"
-#define SYNTAX_INT_DEFINITION "int"
-#define SYNTAX_STR_DEFINITION "string"
-#define SYNTAX_STABLE_DEFINITION "stable"
-#define SYNTAX_PRINT_CALL "print"
-#define SYNTAX_RETURN_STATEMENT "ret"
+#define ASM_SYNTAX_MOV "mov"
+#define ASM_SYNTAX_PUSH "push"
+#define ASM_SYNTAX_POP "pop"
+#define ASM_SYNTAX_SYSCALL "syscall"
 
-#define PRIMARY_FUNCTION "main"
+#define PRIMARY_FUNCTION "start"
 
 #endif
 
