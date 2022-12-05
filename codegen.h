@@ -3,12 +3,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define u32 uint8_t
+typedef struct ELFEND_STRUCT {
+    // 0600 0000 0400 0000 4000 0000 0000 0000
 
-typedef struct BYTEBUFFER {
-    u32 buffer[256];
-} BYTEBUFFER;
-
-BYTEBUFFER *NewBBuffer(void);
+    uint8_t barr[16];
+} ELFEND;
 
 void AssembleCode(char *_fname);
