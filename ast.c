@@ -106,11 +106,6 @@ AST_T *ASTParseFunction(Lexer_T *lexer)
     3. {
     */
 
-    if (MatchExpr(tok->_value, "main"))
-    {
-        printf("Main function!\n");
-    }
-
     /* TODO: Add function arguments */
 
     return node;
